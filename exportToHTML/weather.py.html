@@ -1,0 +1,118 @@
+<html>
+<head>
+<title>weather.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #0033b3;}
+.s1 { color: #080808;}
+.s2 { color: #8c8c8c; font-style: italic;}
+.s3 { color: #067d17;}
+.s4 { color: #1750eb;}
+.s5 { color: #0037a6;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+weather.py</font>
+</center></td></tr></table>
+<pre><span class="s0">from </span><span class="s1">tkinter </span><span class="s0">import </span><span class="s1">*</span>
+<span class="s0">import </span><span class="s1">requests</span>
+<span class="s0">import </span><span class="s1">json</span>
+<span class="s0">from </span><span class="s1">datetime </span><span class="s0">import </span><span class="s1">datetime</span>
+
+
+<span class="s2"># Initialize Window</span>
+
+<span class="s1">root = Tk()</span>
+<span class="s1">root.geometry(</span><span class="s3">&quot;600x1000&quot;</span><span class="s1">)  </span><span class="s2"># size of the window by default</span>
+<span class="s1">root.resizable(</span><span class="s4">0</span><span class="s1">, </span><span class="s4">0</span><span class="s1">)  </span><span class="s2"># to make the window size fixed</span>
+<span class="s2"># title of our window</span>
+<span class="s1">root.title(</span><span class="s3">&quot;Weather App - AskPython.com&quot;</span><span class="s1">)</span>
+<span class="s1">iconPhoto = PhotoImage(file=</span><span class="s3">'Weath.png'</span><span class="s1">)</span>
+<span class="s1">root.iconphoto(</span><span class="s0">False</span><span class="s1">, iconPhoto)  </span><span class="s2"># this is the icon of the Weather Application</span>
+<span class="s1">photo = PhotoImage(file=</span><span class="s3">'Weath.png'</span><span class="s1">)</span>
+<span class="s1">photoLabel = Label(image=photo, width=</span><span class="s4">300</span><span class="s1">, height=</span><span class="s4">200</span><span class="s1">)</span>
+<span class="s1">photoLabel.pack()</span>
+
+<span class="s2"># ----------------------Functions to fetch and display weather info</span>
+<span class="s1">city_value = StringVar()</span>
+
+
+<span class="s0">def </span><span class="s1">time_format_for_location(utc_with_tz):</span>
+    <span class="s1">local_time = datetime.utcfromtimestamp(utc_with_tz)</span>
+    <span class="s0">return </span><span class="s1">local_time.time()</span>
+
+
+<span class="s1">city_value = StringVar()</span>
+
+
+<span class="s0">def </span><span class="s1">showWeather():</span>
+
+    <span class="s1">api_key = </span><span class="s3">&quot;68f4fa0d68fc858ac5aa55e4524ea24f&quot;</span>
+
+    <span class="s2"># Get city name from user from the input field (later in the code)</span>
+    <span class="s1">city_name = city_value.get()</span>
+
+    <span class="s2"># API url</span>
+    <span class="s1">weather_url = </span><span class="s3">'http://api.openweathermap.org/data/2.5/weather?q=' </span><span class="s1">+ city_name + </span><span class="s3">'&amp;appid=' </span><span class="s1">+ api_key</span>
+
+    <span class="s2"># Get the response from fetched url</span>
+    <span class="s1">response = requests.get(weather_url)</span>
+
+    <span class="s2"># changing response from json to python readable</span>
+    <span class="s1">weather_info = response.json()</span>
+
+    <span class="s1">tfield.delete(</span><span class="s3">&quot;1.0&quot;</span><span class="s1">, </span><span class="s3">&quot;end&quot;</span><span class="s1">)  </span><span class="s2"># to clear the text field for every new output</span>
+
+    <span class="s2"># as per API documentation, if the cod is 200, it means that weather data was successfully fetched</span>
+
+    <span class="s0">if </span><span class="s1">weather_info[</span><span class="s3">'cod'</span><span class="s1">] == </span><span class="s4">200</span><span class="s1">:</span>
+        <span class="s1">kelvin = </span><span class="s4">273  </span><span class="s2"># value of kelvin</span>
+
+        <span class="s2"># -----------Storing the fetched values of weather of a city</span>
+
+        <span class="s1">temp = int(weather_info[</span><span class="s3">'main'</span><span class="s1">][</span><span class="s3">'temp'</span><span class="s1">] - kelvin)  </span><span class="s2"># converting default kelvin value to Celcius</span>
+        <span class="s1">feels_like_temp = int(weather_info[</span><span class="s3">'main'</span><span class="s1">][</span><span class="s3">'feels_like'</span><span class="s1">] - kelvin)</span>
+        <span class="s1">pressure = weather_info[</span><span class="s3">'main'</span><span class="s1">][</span><span class="s3">'pressure'</span><span class="s1">]</span>
+        <span class="s1">humidity = weather_info[</span><span class="s3">'main'</span><span class="s1">][</span><span class="s3">'humidity'</span><span class="s1">]</span>
+        <span class="s1">wind_speed = weather_info[</span><span class="s3">'wind'</span><span class="s1">][</span><span class="s3">'speed'</span><span class="s1">] * </span><span class="s4">3.6</span>
+        <span class="s1">sunrise = weather_info[</span><span class="s3">'sys'</span><span class="s1">][</span><span class="s3">'sunrise'</span><span class="s1">]</span>
+        <span class="s1">sunset = weather_info[</span><span class="s3">'sys'</span><span class="s1">][</span><span class="s3">'sunset'</span><span class="s1">]</span>
+        <span class="s1">timezone = weather_info[</span><span class="s3">'timezone'</span><span class="s1">]</span>
+        <span class="s1">cloudy = weather_info[</span><span class="s3">'clouds'</span><span class="s1">][</span><span class="s3">'all'</span><span class="s1">]</span>
+        <span class="s1">description = weather_info[</span><span class="s3">'weather'</span><span class="s1">][</span><span class="s4">0</span><span class="s1">][</span><span class="s3">'description'</span><span class="s1">]</span>
+
+        <span class="s1">sunrise_time = time_format_for_location(sunrise + timezone)</span>
+        <span class="s1">sunset_time = time_format_for_location(sunset + timezone)</span>
+
+        <span class="s2"># assigning Values to our weather variable, to display as output</span>
+
+        <span class="s1">weather = </span><span class="s3">f&quot;</span><span class="s5">\n</span><span class="s3">Weather of: </span><span class="s5">{</span><span class="s1">city_name</span><span class="s5">}\n</span><span class="s3">Temperature (Celsius): </span><span class="s5">{</span><span class="s1">temp</span><span class="s5">}</span><span class="s3">°</span><span class="s5">\n</span><span class="s3">Feels like in (Celsius): </span><span class="s5">{</span><span class="s1">feels_like_temp</span><span class="s5">}</span><span class="s3">°</span><span class="s5">\n</span><span class="s3">Pressure: </span><span class="s5">{</span><span class="s1">pressure</span><span class="s5">} </span><span class="s3">hPa</span><span class="s5">\n</span><span class="s3">Humidity: </span><span class="s5">{</span><span class="s1">humidity</span><span class="s5">}</span><span class="s3">%</span><span class="s5">\n</span><span class="s3">Sunrise at </span><span class="s5">{</span><span class="s1">sunrise_time</span><span class="s5">} </span><span class="s3">and Sunset at </span><span class="s5">{</span><span class="s1">sunset_time</span><span class="s5">}\n</span><span class="s3">Cloud: </span><span class="s5">{</span><span class="s1">cloudy</span><span class="s5">}</span><span class="s3">%</span><span class="s5">\n</span><span class="s3">Info: </span><span class="s5">{</span><span class="s1">description</span><span class="s5">}</span><span class="s3">&quot;</span>
+    <span class="s0">else</span><span class="s1">:</span>
+        <span class="s1">weather = </span><span class="s3">f&quot;</span><span class="s5">\n\t</span><span class="s3">Weather for '</span><span class="s5">{</span><span class="s1">city_name</span><span class="s5">}</span><span class="s3">' not found!</span><span class="s5">\n\t</span><span class="s3">Kindly Enter valid City Name !!&quot;</span>
+
+    <span class="s1">tfield.insert(INSERT, weather)  </span><span class="s2"># to insert or send value in our Text Field to display output</span>
+
+
+<span class="s2"># ------------------------------Frontend part of code - Interface</span>
+
+
+<span class="s1">city_head = Label(root, text=</span><span class="s3">'Enter City Name'</span><span class="s1">, font=</span><span class="s3">'Arial 12 bold'</span><span class="s1">).pack(pady=</span><span class="s4">10</span><span class="s1">)  </span><span class="s2"># to generate label heading</span>
+
+<span class="s1">inp_city = Entry(root, textvariable=city_value, width=</span><span class="s4">24</span><span class="s1">, font=</span><span class="s3">'Arial 14 bold'</span><span class="s1">).pack()</span>
+
+<span class="s1">Button(root, command=showWeather, text=</span><span class="s3">&quot;Check Weather&quot;</span><span class="s1">, font=</span><span class="s3">&quot;Arial 10&quot;</span><span class="s1">, bg=</span><span class="s3">'lightblue'</span><span class="s1">, fg=</span><span class="s3">'black'</span><span class="s1">,</span>
+       <span class="s1">activebackground=</span><span class="s3">&quot;teal&quot;</span><span class="s1">, padx=</span><span class="s4">5</span><span class="s1">, pady=</span><span class="s4">5</span><span class="s1">).pack(pady=</span><span class="s4">20</span><span class="s1">)</span>
+
+<span class="s2"># to show output</span>
+
+<span class="s1">weather_now = Label(root, text=</span><span class="s3">&quot;The Weather is:&quot;</span><span class="s1">, font=</span><span class="s3">'arial 12 bold'</span><span class="s1">).pack(pady=</span><span class="s4">10</span><span class="s1">)</span>
+
+<span class="s1">tfield = Text(root, width=</span><span class="s4">46</span><span class="s1">, height=</span><span class="s4">10</span><span class="s1">)</span>
+<span class="s1">tfield.pack()</span>
+
+<span class="s1">root.mainloop()</span></pre>
+</body>
+</html>
